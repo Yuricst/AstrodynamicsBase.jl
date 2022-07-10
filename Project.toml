@@ -1,0 +1,7 @@
+name = "AstrodynamicsBase"
+uuid = "57933daa-df0e-420d-8f23-cd8ea4acb30f"
+authors = ["yuri@tux <yuri.shimane@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
