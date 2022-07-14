@@ -28,16 +28,6 @@ end
 
 
 """
-    spice_et2utc(et::Float64, format::Char='C', prec::Int=3)
-
-Wrapper for et2utc()
-"""
-function spice_et2utc(et::Float64, format::Char = 'C', prec::Int = 3)
-    return et2utc(et, format, prec)
-end
-
-
-"""
     spice_et2utc(et::Float64, format::String='C', prec::Int=3)
 
 Wrapper for et2utc()
