@@ -354,7 +354,7 @@ end
 """
 Convert MEE to Cartesian
 """
-function mee2cart(oe_mee::Vector, μ::Real)
+function mee2cart(oe_mee::Vector, mu::Real)
     # unpack
 	p,f,g,h,k,L = oe_mee
 	# intermediate values
