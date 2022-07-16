@@ -277,7 +277,6 @@ end
 
 
 
-#export sCARTtoOSC
 """
 	cartesian_to_keplerian(x::Vector, mu::Real, use_degrees::Bool=false)
 
