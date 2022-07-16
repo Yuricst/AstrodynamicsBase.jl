@@ -267,8 +267,8 @@ function kep2cart(x_oe::Array{<:Real,1}, μ::Real)
     rpf = [x, y, 0.0]
     vpf = [vx, vy, 0.0]
 
-    r_rot3 = _perifocal2geocentric(rpf, ω, inc, Ω)
-    v_rot3 = _perifocal2geocentric(vpf, ω, inc, Ω)
+    r_rot3 = perifocal2geocentric(rpf, ω, inc, Ω)
+    v_rot3 = perifocal2geocentric(vpf, ω, inc, Ω)
 
     # save inertial state
     state_inr = vcat(r_rot3, v_rot3)[:] # cat(r_rot3, v_rot3, dims=(1,1))

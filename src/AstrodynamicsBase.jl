@@ -4,6 +4,7 @@ module AstrodynamicsBase
     using SPICE
 
     include("trigonometry.jl")
+    include("transformations.jl")
     include("body_properties.jl")
     include("elements.jl")
     include("canonical.jl")
@@ -11,6 +12,10 @@ module AstrodynamicsBase
     include("canonical_thrust.jl")
 
     export acos_safe, asin_safe
+    export _rotmat_ax1,
+        _rotmat_ax2,
+        _rotmat_ax3,
+        rotating2inertial, inertial2rotating, perifocal2geocentric
     export get_body_soi, get_canonical_param
     export kep2cart, cart2kep, kep2mee, mee2kep, mee2cart, cart2mee, cart2poincare
     export spice_furnsh,
@@ -20,8 +25,8 @@ module AstrodynamicsBase
         interp_spkssb,
         shift_eclipj2000_to_bodycenter,
         spice_spkssb
-    export dimensional2canonical_thrust, 
-        dimensional2canonical_mdot, 
+    export dimensional2canonical_thrust,
+        dimensional2canonical_mdot,
         dimensional2canonical_isp
 
 end # module
