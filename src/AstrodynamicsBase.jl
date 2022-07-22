@@ -10,6 +10,8 @@ module AstrodynamicsBase
     include("canonical.jl")
     include("spice_helper.jl")
     include("canonical_thrust.jl")
+    include("kepler_problem.jl")
+    include("diffeq_twobody.jl")
 
     export acos_safe, asin_safe
     export _rotmat_ax1,
@@ -17,7 +19,7 @@ module AstrodynamicsBase
         _rotmat_ax3,
         rotating2inertial, inertial2rotating, perifocal2geocentric
     export get_body_soi, get_canonical_param
-    export kep2cart, cart2kep, kep2mee, mee2kep, mee2cart, cart2mee, cart2poincare
+    export kep2cart, cart2kep, kep2mee, mee2kep, mee2cart, cart2mee, cart2poincare, get_period
     export spice_furnsh,
         spice_utc2et,
         spice_et2utc,
