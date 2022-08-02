@@ -345,6 +345,10 @@ function mee2kep(mee_elts::Array{<:Real,1})
     ω = atan(g * h - f * k, f * h + g * k)
     Ω = atan(k, h)
     θ = L - atan(g, h)
+    # check for eccentricity
+    if ecc > 1
+        sma = -sma
+    end
     return [sma, ecc, inc, Ω, ω, θ]
 end
 
