@@ -2,6 +2,7 @@ module AstrodynamicsBase
 
     using LinearAlgebra
     using SPICE
+    using Dates
 
     include("trigonometry.jl")
     include("transformations.jl")
@@ -12,6 +13,8 @@ module AstrodynamicsBase
     include("canonical_thrust.jl")
     include("kepler_problem.jl")
     include("diffeq_twobody.jl")
+    include("orbit.jl")
+
 
     export acos_safe, asin_safe
     export _rotmat_ax1,
@@ -23,6 +26,7 @@ module AstrodynamicsBase
     export spice_furnsh,
         spice_utc2et,
         spice_et2utc,
+        et2datetime,
         get_spice_locate_function,
         interp_spkssb,
         shift_eclipj2000_to_bodycenter,

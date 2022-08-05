@@ -38,9 +38,22 @@ end
 
 
 """
+	et2datetime(et::Float64)
+
+Convert epehemris seconds to DateTime object
+"""
+function et2datetime(et::Float64)
+	DateTime(
+        spice_et2utc(et, "ISOC")[1:10]*" "*spice_et2utc(et, "ISOC")[12:end-4],
+        "yyyy-mm-dd HH:MM:SS"
+    )
+end
+
+
+"""
 	get_spice_locate_function(
 		body_id::Int,
-		et0::Float64, 
+		et0::Float64,
 		etf::Float64,
 		canonical_params=nothing,
 		frame::String="ECLIPJ2000"
@@ -51,7 +64,7 @@ Create function with signature:
 """
 function get_spice_locate_function(
 	body_id::Int,
-	et0::Float64, 
+	et0::Float64,
 	frame::String="ECLIPJ2000"
 )
 	# if canonical parameters is not provided, create Sun-Earth based ones
@@ -78,7 +91,7 @@ end
 """
 	get_spice_locate_function(
 		body_id::Int,
-		et0_str::String="2022-01-01T00:00:00.00", 
+		et0_str::String="2022-01-01T00:00:00.00",
 		canonical_params=nothing,
 		frame::String="ECLIPJ2000"
 	)
@@ -87,7 +100,7 @@ Alias with string-based inputs for earliest epoch
 """
 function get_spice_locate_function(
 	body_id::Int,
-	et0_str::String="2022-01-01T00:00:00.00", 
+	et0_str::String="2022-01-01T00:00:00.00",
 	canonical_params=nothing,
 	frame::String="ECLIPJ2000"
 )
@@ -212,4 +225,3 @@ function spice_spkssb(
         return vcat(sv_shifted[1:3] / lstar, sv_shifted[4:6] / vstar)
     end
 end
-
