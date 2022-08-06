@@ -21,7 +21,14 @@ module AstrodynamicsBase
         _rotmat_ax2,
         _rotmat_ax3,
         rotating2inertial, inertial2rotating, perifocal2geocentric
-    export get_body_soi, get_canonical_param
+    export get_gm,
+        get_gm_de431,
+        get_body_radius,
+        get_body_period,
+        get_body_sma,
+        get_body_soi,
+        get_canonical_param,
+        get_semiMajorAxes
     export kep2cart, cart2kep, kep2mee, mee2kep, mee2cart, cart2mee, cart2poincare, get_period
     export spice_furnsh,
         spice_utc2et,
