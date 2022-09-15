@@ -15,6 +15,7 @@ module AstrodynamicsBase
     include("kepler_problem.jl")
     include("diffeq_twobody.jl")
     include("orbit.jl")
+    include("tle.jl")
 
     export mod_custom, angle_difference
     export acos_safe, asin_safe
@@ -42,5 +43,6 @@ module AstrodynamicsBase
     export dimensional2canonical_thrust,
         dimensional2canonical_mdot,
         dimensional2canonical_isp
+    export tle_from_file
 
 end # module

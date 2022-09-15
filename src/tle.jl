@@ -71,8 +71,7 @@ Note the definition of a day in TLE is mean solar day, not sidereal day.
 function tle2kep(tle_dict::Dict, μ_Earth::Real=398600.4418, day::Real=86400.002)
     n = tle_dict["MeanMotion"]*2π/day  # rev/day -> rad/sec
     sma = (μ_Earth/n^2)^(1/3)
-    MA = deg2rad(tle_dict["MeanAnomaly"])
-    TA = MA  # FIXME
+    TA = anomaly_mean_to_true(deg2rad(tle_dict["MeanAnomaly"]), tle_dict["Eccentricity"])
     kep_elts = [
         sma,
         tle_dict["Eccentricity"],
@@ -82,4 +81,20 @@ function tle2kep(tle_dict::Dict, μ_Earth::Real=398600.4418, day::Real=86400.002
         TA
     ]
     return kep_elts
+end
+
+
+"""
+    query(search_key::String, dictionary::Dict)
+
+Query dictionary based on partial key
+"""
+function query(search_key::String, dictionary::Dict)
+    query_result = Dict()
+    for key in keys(dictionary)
+        if occursin(search_key, key)
+            query_result[key] = dictionary[key]
+        end
+    end
+    return query_result
 end

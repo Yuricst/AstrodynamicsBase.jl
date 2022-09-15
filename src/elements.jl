@@ -64,12 +64,16 @@ function get_raan(state::Array{<:Real,1})
     zdir = [0, 0, 1]
     ndir = cross(zdir, h)
     # compute RAAN
-    Ω = atan(ndir[2], ndir[1])
-    if Ω < 0.0
-        return 2π + Ω
-    else
-        return Ω
-    end
+	if norm(ndir) > 0
+	    Ω = atan(ndir[2], ndir[1])
+	    if Ω < 0.0
+	        return 2π + Ω
+	    else
+	        return Ω
+	    end
+	else  # if ndir == 0, orbit is planar
+		return 0.0
+	end
 end
 
 
@@ -89,15 +93,36 @@ function get_aop(state::Array{<:Real,1}, mu::Float64)
     ndir = cross(zdir, h)
     # compute eccentricity vector
     ecc = (1 / mu) * cross(v, h) - r / norm(r)
-    if (norm(ecc) != 0) && (norm(ndir) != 0)
-        ω = acos_safe(dot(ndir, ecc) / (norm(ndir) * norm(ecc)))
-        if ecc[3] < 0
-            ω = 2π - ω
-        end
-    else
-        ω = 0.0  #get_raan(state)
+    if (norm(ecc) != 0) && (norm(ndir) != 0)  # if not circular & not planar
+		ω = acos_safe(dot(ndir, ecc) / (norm(ndir) * norm(ecc)))
+		if ecc[3] < 0  # retrograde
+			ω = 2π - ω
+		end
+		#ω = atan(norm(cross(ndir,ecc)), dot(ndir,ecc))
+	elseif (norm(ecc) != 0) && norm(ndir) == 0  # if not circular & planar
+		ω = atan(ecc[2], ecc[1])   # retrograde handled since atan2
+		if ω < 0.0
+	        return 2π + ω
+		end
+    else  # if circular and planar
+        ω = 0.0  # atan(ecc[2], ecc[1])
     end
     return ω
+end
+
+
+function get_aop_atan(state::Array{<:Real,1}, mu::Float64)
+    # decompose state to position and velocity vector
+    r = state[1:3]
+    v = state[4:6]
+    # angular momentum
+    h = cross(r, v)
+    # normal direction of xy-plane
+    zdir = [0, 0, 1]
+    ndir = cross(zdir, h)
+    # compute eccentricity vector
+    ecc = (1 / mu) * cross(v, h) - r / norm(r)
+	return atan(norm(cross(ndir,ecc)), dot(ndir,ecc))
 end
 
 
@@ -241,6 +266,17 @@ function anomaly_mean_to_eccentric(M::Real, e::Real; use_degrees::Bool=false)
     end
 
     return E
+end
+
+
+function anomaly_mean_to_true(M::Real, e::Real; use_degrees::Bool=false)
+	EA = anomaly_mean_to_eccentric(M, e)  # in radians
+	ta = 2*atan(sqrt((1+e)/(1-e))*tan(EA/2))
+	# Convert degree output
+    if use_degrees == true
+        ta *= 180.0/pi
+    end
+    return ta
 end
 
 
