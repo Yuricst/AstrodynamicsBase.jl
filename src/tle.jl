@@ -21,8 +21,8 @@ function tle_three_lines(sat_string::Vector{String})
         "EpochYear"               => parse(Int64, line1[19:20]),
         "EopchDay"                => parse(Float64, line1[21:32]),
         "dMeanMotion"             => parse(Float64, line1[34:43]),
-        "d2MeanMotion"            => line1[45:52], # TBC
-        "BSTAR"                   => line1[54:61], # TBC
+        "d2MeanMotion"            => line1[45:52],      # FIXME
+        "BSTAR"                   => line1[54:61],      # FIXME
         "EphemerisType"           => parse(Int64, line1[63]),
         "ElementSetNumber"        => parse(Int64, line1[65:68]),
         # second line

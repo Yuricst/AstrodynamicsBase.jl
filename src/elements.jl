@@ -191,7 +191,7 @@ function anomaly_eccentric_to_mean(E::Real, e::Real; use_degrees::Bool=false)
     return M
 end
 
-#export anomaly_mean_to_eccentric
+
 """
 Convert mean anomaly into eccentric anomaly.
 Arguments:

@@ -4,6 +4,7 @@ module AstrodynamicsBase
     using SPICE
     using Dates
 
+    include("misc.jl")
     include("trigonometry.jl")
     include("transformations.jl")
     include("body_properties.jl")
@@ -15,7 +16,7 @@ module AstrodynamicsBase
     include("diffeq_twobody.jl")
     include("orbit.jl")
 
-
+    export mod_custom, angle_difference
     export acos_safe, asin_safe
     export _rotmat_ax1,
         _rotmat_ax2,
