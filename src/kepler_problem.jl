@@ -4,7 +4,7 @@ Function for propagate using Kepler's equation with G. Der (1996)'s formulation
 
 
 """Hyperbolic sine function"""
-function hypertrig_s(z::Float64)
+function hypertrig_s(z::Union{Real,ForwardDiff.Dual})
     if z > 0.0
         s = (sqrt(z) - sin(sqrt(z))) / (sqrt(z))^3
     elseif z < 0.0
@@ -17,7 +17,7 @@ end
 
 
 """Hyperbolic cosine function"""
-function hypertrig_c(z::Float64)
+function hypertrig_c(z::Union{Real,ForwardDiff.Dual})
     if z > 0.0
         c = (1.0 - cos(sqrt(z))) / z
     elseif z < 0.0
@@ -30,7 +30,7 @@ end
 
 
 """Lagrange parameter functions"""
-function universal_functions(x::Float64, alpha::Float64)
+function universal_functions(x::Union{Real,ForwardDiff.Dual}, alpha::Float64)
     """Function computes U0 ~ U3 from G. Der 1996"""
     # evaluate hypertrig function
     S = hypertrig_s(alpha * x^2)
@@ -46,10 +46,10 @@ end
 
 """Function computes Kepler's time equation and its derivatives in G. Der 1996 form"""
 function kepler_der_residual(
-    x::Float64,
+    x::Union{Real,ForwardDiff.Dual},
     alpha::Float64,
-    t::Float64,
-    t0::Float64,
+    t::Union{Real,ForwardDiff.Dual},
+    t0::Union{Real,ForwardDiff.Dual},
     mu::Float64,
     r0::Float64,
     sigma0::Float64,
@@ -64,17 +64,17 @@ end
 
 """Function computes Lagrange coefficients (as functionined in G. Der 1996)"""
 function lagrange_coefficients_der(
-    mu::Float64,
-    alpha::Float64,
-    r0::Float64,
-    v0::Float64,
-    sigma0::Float64,
-    u0::Float64,
-    u1::Float64,
-    u2::Float64,
-    u3::Float64,
-    r::Float64,
-    sigma::Float64,
+    mu::Real,
+    alpha::Real,
+    r0::Real,
+    v0::Real,
+    sigma0::Union{Real,ForwardDiff.Dual},
+    u0::Union{Real,ForwardDiff.Dual},
+    u1::Union{Real,ForwardDiff.Dual},
+    u2::Union{Real,ForwardDiff.Dual},
+    u3::Union{Real,ForwardDiff.Dual},
+    r::Union{Real,ForwardDiff.Dual},
+    sigma::Union{Real,ForwardDiff.Dual},
 )
     # scalar function
     f = 1.0 - u2 / r0
@@ -87,7 +87,7 @@ end
 
 """Scalar coefficients of STM dyads (eqn.18)"""
 function der_stm_coefs(
-    mu::Float64,
+    mu::Real,
     alpha::Float64,
     r0::Float64,
     v0::Float64,
@@ -284,10 +284,10 @@ Formulation from G. Der formulation.
     `(array)`: final state
 """
 function keplerder_nostm(
-    mu::Float64,
+    mu::Real,
     state0::Array{<:Real,1},
-    t0::Float64,
-    t::Float64,
+    t0::Real,
+    t::Union{Real,ForwardDiff.Dual},
     tol::Float64,
     maxiter::Int,
 )
@@ -401,3 +401,22 @@ function keplerder_nostm(
     end
     return prop[:,end], prop
 end
+
+
+"""
+Propagate position and velocity, keeping mass constant
+"""
+function keplerder_mass(
+    mu::Float64,
+    state0::Array{<:Real,1},
+    t0::Float64,
+    t::Float64,
+    tol::Float64,
+    maxiter::Int,
+)
+    rvf = keplerder_nostm(
+        mu, state0[1:6], t0, t, tol, maxiter
+    )
+    return [rvf[1], rvf[2], rvf[3], rvf[4], rvf[5], rvf[6], state0[7]]
+end
+

@@ -338,9 +338,11 @@ end
 
 
 """
+    kep2mee(oe_kep::Vector, use_ta::Bool=true)
+
 Convert Keplerian to MEE
 """
-function kep2mee(oe_kep::Vector, use_ta::Bool = true)
+function kep2mee(oe_kep::Vector, use_ta::Bool=true)
     # unpack
     sma, ecc, inc, Ω, ω, θ = oe_kep
     # convert

@@ -3,6 +3,7 @@ module AstrodynamicsBase
     using LinearAlgebra
     using SPICE
     using Dates
+    import ForwardDiff
 
     include("misc.jl")
     include("trigonometry.jl")
