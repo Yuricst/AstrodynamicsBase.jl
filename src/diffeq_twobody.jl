@@ -3,6 +3,9 @@ Generic two body differential DifferentialEquations
 """
 
 
+"""
+Equations of motion for 
+"""
 function twobody_cartesian!(du, u, p, t)
     # unpack arguemnts
     μ = p[1]
@@ -13,7 +16,7 @@ function twobody_cartesian!(du, u, p, t)
     du[2] = u[5]
     du[3] = u[6]
     # velocities
-    du[4] = -(μ / r^3) * u[1] 
-    du[5] = -(μ / r^3) * u[2] 
+    du[4] = -(μ / r^3) * u[1]
+    du[5] = -(μ / r^3) * u[2]
     du[6] = -(μ / r^3) * u[3]
 end
