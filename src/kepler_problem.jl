@@ -3,11 +3,15 @@ Function for propagate using Kepler's equation with G. Der (1996)'s formulation
 """
 
 
-"""Hyperbolic sine function"""
+"""
+    hypertrig_s(z::Union{Real,ForwardDiff.Dual}, epsilon::Real=1e-6)
+
+Hyperbolic sine function
+"""
 function hypertrig_s(z::Union{Real,ForwardDiff.Dual}, epsilon::Real=1e-6)
     if z > epsilon
         s = (sqrt(z) - sin(sqrt(z))) / (sqrt(z))^3
-    elseif z < epsilon
+    elseif z < -epsilon
         s = (sinh(sqrt(-z)) - sqrt(-z)) / (sqrt(-z))^3
     else
         s = 1/6 - z/120 + z^2/5040 - z^3/362880
@@ -16,17 +20,22 @@ function hypertrig_s(z::Union{Real,ForwardDiff.Dual}, epsilon::Real=1e-6)
 end
 
 
-"""Hyperbolic cosine function"""
+"""
+    hypertrig_c(z::Union{Real,ForwardDiff.Dual}, epsilon::Real=1e-6)
+
+Hyperbolic cosine function
+"""
 function hypertrig_c(z::Union{Real,ForwardDiff.Dual}, epsilon::Real=1e-6)
     if z > epsilon
         c = (1.0 - cos(sqrt(z))) / z
-    elseif z < epsilon
+    elseif z < -epsilon
         c = (cosh(-z) - 1) / (-z)
     else
         c = 1/2 - z/24 + z^2/720 - z^3/40320
     end
     return c
 end
+
 
 
 
