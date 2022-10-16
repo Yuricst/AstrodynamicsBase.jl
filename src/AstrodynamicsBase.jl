@@ -18,7 +18,7 @@ module AstrodynamicsBase
     include("orbit.jl")
     include("tle.jl")
 
-    export mod_custom, angle_difference
+    export mod_custom, angle_difference, get_sphere_surface
     export acos_safe, asin_safe
     export _rotmat_ax1,
         _rotmat_ax2,
