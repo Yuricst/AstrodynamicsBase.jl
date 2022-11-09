@@ -14,9 +14,11 @@ module AstrodynamicsBase
     include("spice_helper.jl")
     include("canonical_thrust.jl")
     include("kepler_problem.jl")
-    include("diffeq_twobody.jl")
+    include("eom/diffeq_twobody.jl")
+    include("eom/diffeq_mee.jl")
     include("orbit.jl")
     include("tle.jl")
+    include("kustaanheimo_stiefel.jl")
 
     export mod_custom, angle_difference, get_sphere_surface
     export acos_safe, asin_safe
