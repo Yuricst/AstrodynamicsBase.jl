@@ -461,7 +461,7 @@ end
 """
 Convert Cartesian states to Poincare elements
 """
-function cart2poincare(rv::Array{<:Real,1}, mu::Real, use_L::bool=true)
+function cart2poincare(rv::Array{<:Real,1}, mu::Real, use_L::Bool=true)
 	# get MEEs and Keplerian elements
 	oe_mee = cart2mee(rv, mu)
 	oe_kep = cart2kep(rv, mu)
