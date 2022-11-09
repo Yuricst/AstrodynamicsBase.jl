@@ -114,5 +114,15 @@ ptraj = plot(frame_style=:box, camera=(70,10), xlabel="x, DU", ylabel="y, DU", z
 plot!(ptraj, traj_khsf2cart[1,:], traj_khsf2cart[2,:], traj_khsf2cart[3,:], label="Kustaanheimo-Stiefel")
 plot!(ptraj, traj_mee2cart[1,:], traj_mee2cart[2,:], traj_mee2cart[3,:], label="MEE")
 
-display(plot(ptraj, ph; layout=(1,2), size=(800,400)))
+pkh_p = plot(frame_style=:box, xlabel="time, TU",)
+for i = 1:4
+    plot!(pkh_p, sol_khsf.t, Array(sol_khsf)[i,:], label="p_$i")
+end
+
+pkh_pprime = plot(frame_style=:box, xlabel="time, TU",)
+for i = 1:4
+    plot!(pkh_pprime, sol_khsf.t, Array(sol_khsf)[4+i,:], label="p'_$i")
+end
+
+display(plot(ptraj, ph, pkh_p, pkh_pprime; layout=(2,2), size=(800,800)))
 
