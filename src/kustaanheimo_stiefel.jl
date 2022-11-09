@@ -89,7 +89,7 @@ function twobody_khsf!(du, u, params, s)
          u[4] -u[3]  u[2] -u[1];
     ]
     pnorm2  = norm(u[1:4])^2
-    du[5:8] = -u[9]/2*u[1:4] + pnorm2/2 * dot(L_T, accel)
+    du[5:8] = -u[9]/2*u[1:4] + pnorm2/2 * L_T * accel
     # derivative of h 
     du[9]   = - 2 * dot([u[5] u[6] u[7] u[8]], L_T, accel)
     # derivative of t
