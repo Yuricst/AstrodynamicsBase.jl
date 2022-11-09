@@ -7,7 +7,7 @@ elements
 """
 Compute semi-major axis from Cartesian state
 """
-function get_semiMajorAxis(state::Array{<:Real,1}, mu::Float64)
+function get_semiMajorAxis(state::Array{<:Real,1}, mu::Real)
 	# Initialize Cartesian Polistion and Velocity
     r = state[1:3]
     v = state[4:6]
@@ -19,7 +19,7 @@ end
 """
 Compute eccentricity from Cartesian state
 """
-function get_eccentricity(state::Array{<:Real,1}, mu::Float64)
+function get_eccentricity(state::Array{<:Real,1}, mu::Real)
 	# Initialize Cartesian Polistion and Velocity
     r = state[1:3]
     v = state[4:6]
@@ -78,11 +78,11 @@ end
 
 
 """
-	get_aop(state::Array{<:Real,1}, mu::Float64)
+	get_aop(state::Array{<:Real,1}, mu::Real)
 
 Compute AOP in radians from Cartesian state
 """
-function get_aop(state::Array{<:Real,1}, mu::Float64)
+function get_aop(state::Array{<:Real,1}, mu::Real)
     # decompose state to position and velocity vector
     r = state[1:3]
     v = state[4:6]
@@ -111,7 +111,7 @@ function get_aop(state::Array{<:Real,1}, mu::Float64)
 end
 
 
-function get_aop_atan(state::Array{<:Real,1}, mu::Float64)
+function get_aop_atan(state::Array{<:Real,1}, mu::Real)
     # decompose state to position and velocity vector
     r = state[1:3]
     v = state[4:6]
@@ -129,7 +129,7 @@ end
 """
 Compute true-anomaly in radians from Cartesian state
 """
-function get_trueanomaly(state::Array{<:Real,1}, mu::Float64)
+function get_trueanomaly(state::Array{<:Real,1}, mu::Real)
     # decompose state to position and velocity vector
     r = state[1:3]
     v = state[4:6]
@@ -159,7 +159,7 @@ end
 """
 Compute period from Cartesian state
 """
-function get_period(state::Array{<:Real,1}, mu::Float64)
+function get_period(state::Array{<:Real,1}, mu::Real)
     a = get_semiMajorAxis(state, mu)
     if a > 0
         period = 2 * pi * sqrt(a^3 / mu)
@@ -174,7 +174,7 @@ end
 Compute flight-path angle in radians from Cartesian state
 FPA is defined between perpendicular to position vector and velocity vector.
 """
-function get_fpa(state::Array{<:Real,1}, mu::Float64)
+function get_fpa(state::Array{<:Real,1}, mu::Real)
     h = norm(cross(state[1:3], state[4:6]))
     vperp = h / norm(state[1:3])
     vr = mu / h * norm(get_eccentricity(state, mu)) * sin(get_trueanomaly(state, mu))
@@ -461,15 +461,19 @@ end
 """
 Convert Cartesian states to Poincare elements
 """
-function cart2poincare(rv::Array{<:Real,1}, mu::Real)
+function cart2poincare(rv::Array{<:Real,1}, mu::Real, use_L::bool=true)
 	# get MEEs and Keplerian elements
-	oe_mee = cartesian_to_modifiedEquinoctial(rv, mu)
-	oe_kep = cartesian_to_keplerian(rv, mu)
+	oe_mee = cart2mee(rv, mu)
+	oe_kep = cart2kep(rv, mu)
 	# extract
-	p,f,g,h,k,_ = oe_mee
+	p,f,g,h,k,L = oe_mee
 	a,e,i,Ω,ω,θ = oe_kep
-	# mean anomaly
-	ma = anomaly_true_to_mean(θ, e)
+	if use_L == true
+		anomaly = L
+	else
+		# mean anomaly
+		anomaly = anomaly_true_to_mean(θ, e)
+	end
 	# compute reoccuring values
 	sqrt_1_e2 = sqrt(1-e^2)
 	# compute poincare elements
@@ -478,14 +482,14 @@ function cart2poincare(rv::Array{<:Real,1}, mu::Real)
 	η = f * sqrt(2Λ/(1 + sqrt_1_e2))
 	u = k * sqrt(2Λ*sqrt_1_e2/(1 + cos(i)))
 	v = h * sqrt(2Λ*sqrt_1_e2/(1 + cos(i)))
-	λ = ma + Ω + ω
+	λ = anomaly + Ω + ω
 	return [Λ,ξ,η,u,v,λ]
 end
 
 
 """
 	cart2spherical(sv_cartesian::Array{<:Real,1})
-	
+
 Convert Cartesian to Spherical
 """
 function cart2spherical(sv_cartesian::Array{<:Real,1})
