@@ -481,3 +481,24 @@ function cart2poincare(rv::Array{<:Real,1}, mu::Real)
 	λ = ma + Ω + ω
 	return [Λ,ξ,η,u,v,λ]
 end
+
+
+"""
+	cart2spherical(sv_cartesian::Array{<:Real,1})
+	
+Convert Cartesian to Spherical
+"""
+function cart2spherical(sv_cartesian::Array{<:Real,1})
+    # unpack state-vector
+    x,y,z,vx,vy,vz = sv_cartesian
+    r = sqrt(x^2 + y^2 + z^2)
+    sv_spherical = [
+        r,
+        atan(y,x),
+        asin(z/r),
+        (x*vx+y*vy+z*vz)/r,
+        (vx*y - x*vy)/(x^2+y^2),
+        (z*(x*vx+y*vy) - (x^2+y^2)*vz)/((x^2+y^2+z^2)*sqrt(x^2+y^2))
+    ]
+    return sv_spherical
+end
