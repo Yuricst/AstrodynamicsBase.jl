@@ -475,7 +475,11 @@ function cart2poincare(rv::Array{<:Real,1}, mu::Real, use_L::Bool=true)
 		anomaly = anomaly_true_to_mean(θ, e)
 	end
 	# compute reoccuring values
-	sqrt_1_e2 = sqrt(1-e^2)
+	if e < 1
+		sqrt_1_e2 = sqrt(1-e^2)
+	else
+		sqrt_1_e2 = sqrt(e^2 - 1)  # UGLY FIX
+	end
 	# compute poincare elements
 	Λ = sqrt(mu*a)
 	ξ = g * sqrt(2Λ/(1 + sqrt_1_e2))
