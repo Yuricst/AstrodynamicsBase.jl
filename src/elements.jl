@@ -481,7 +481,7 @@ function cart2poincare(rv::Array{<:Real,1}, mu::Real, use_L::Bool=true)
 		sqrt_1_e2 = sqrt(e^2 - 1)  # UGLY FIX
 	end
 	# compute poincare elements
-	Λ = sqrt(mu*a)
+	Λ = sqrt(mu*abs(a))  # UGLY FIX
 	ξ = g * sqrt(2Λ/(1 + sqrt_1_e2))
 	η = f * sqrt(2Λ/(1 + sqrt_1_e2))
 	u = k * sqrt(2Λ*sqrt_1_e2/(1 + cos(i)))
