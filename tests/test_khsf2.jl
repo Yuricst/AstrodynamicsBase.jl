@@ -10,6 +10,7 @@ using Printf
 using LinearAlgebra
 using DifferentialEquations
 using Plots
+plotly()
 
 ## Conversion tests
 mu = 1.0
@@ -46,10 +47,10 @@ u0 = vcat(
     0.0,  # t0
     1.0   # mass at t0
 )
-tspan = (0.0, 300.0)
+tspan = (0.0, 3period)
 params = [0.0, 0.0, 0.0, 1e-3, 1e-4]
 
-# ---------------- KH propagation ---------------- #
+# ---------------- KH propagation 1 ---------------- #
 tstart = time()
 prob_khsf = ODEProblem(AstrodynamicsBase.twobody_khsf!,u0,tspan,params);
 sol_khsf  = solve(prob_khsf, Tsit5(), reltol=1e-12, abstol=1e-12);
@@ -63,65 +64,55 @@ for (i,s) in enumerate(s_eval)
     traj_khsf2cart[:,i] = AstrodynamicsBase.khsf2cart(sol_khsf(s)[1:8])
 end
 
-# ---------------- MEE propagation ---------------- #
-x_mee = AstrodynamicsBase.cart2mee(x_cart, mu)
-tstart = time()
-prob_mee = ODEProblem(
-    AstrodynamicsBase.twobody_mee!,
-    vcat(x_mee,1.0),
-    [0,sol_khsf.u[end][10]],
-    vcat(mu,params),
-);
-sol_mee  = solve(prob_mee, Tsit5(), reltol=1e-12, abstol=1e-12);
-tend = time()
-@printf("Elapsed with MEE propagation: %4.4f sec\n", tend-tstart)
+println("Propagation with Kustaanheimo-Stiefel...")
+x_cart = AstrodynamicsBase.kep2cart([1.8, 0.3, 0.2, 0.3, 5.3, 0.2], mu)
+period = AstrodynamicsBase.get_period(x_cart, mu)
+println("Period: $period")
+h0 = mu/norm(x_cart[1:3]) - norm(x_cart[4:6])^2/2
+u0 = vcat(
+    AstrodynamicsBase.cart2khsf(x_cart),
+    h0,   # initial negative of energy
+    0.0,  # t0
+    1.0   # mass at t0
+)
+params = [0.0, 0.0, 0.0, 1e-3, 1e-4]
 
-# calculate (negative of) specific energy at each MEE state
-h_mee = zeros(length(sol_mee.t))
-for (i,u) in enumerate(sol_mee.u)
-    sv_cart = AstrodynamicsBase.mee2cart(u, mu)
-    h_mee[i] = mu/norm(sv_cart[1:3]) - norm(sv_cart[4:6])^2/2
-end
+# ---------------- KH propagation 2 ---------------- #
+tstart = time()
+prob_khsf = ODEProblem(AstrodynamicsBase.twobody_khsf!,u0,tspan,params);
+sol_khsf2  = solve(prob_khsf, Tsit5(), reltol=1e-12, abstol=1e-12);
+tend = time()
+@printf("Elapsed with KH propagation: %4.4f sec\n", tend-tstart)
 
 # convert KH result to cartesian states
-t_eval = LinRange(0, sol_mee.t[end], 1000)
-traj_mee2cart = zeros(6,length(t_eval))
-for (i,t) in enumerate(t_eval)
-    traj_mee2cart[:,i] = AstrodynamicsBase.mee2cart(sol_mee(t)[1:6], mu)
+s_eval = LinRange(0, sol_khsf2.t[end], 1000)
+traj_khsf2cart2 = zeros(6,length(s_eval))
+for (i,s) in enumerate(s_eval)
+    traj_khsf2cart2[:,i] = AstrodynamicsBase.khsf2cart(sol_khsf2(s)[1:8])
 end
 
-# ---------------- Cartesian propagation for comparison ---------------- #
-tstart = time()
-prob_cart = ODEProblem(AstrodynamicsBase.twobody_cartesian!,x_cart,[0,sol_khsf.u[end][10]],[mu,]);
-sol_cart  = solve(prob_cart, Tsit5(), reltol=1e-12, abstol=1e-12);
-tend = time()
-@printf("Elapsed with Cartesian propagation: %4.4f sec\n", tend-tstart)
-
-# calculate (negative of) specific energy at each Cartesian state
-h_cart = zeros(length(sol_cart.t))
-for (i,u) in enumerate(sol_cart.u)
-    h_cart[i] = mu/norm(u[1:3]) - norm(u[4:6])^2/2
-end
 
 # ---------------- Plot ---------------- #
 println("Plotting...")
 ph = plot(frame_style=:box, xlabel="time, TU", ylabel="h, DU^2/TU^2")
 plot!(ph, Array(sol_khsf)[10,:], Array(sol_khsf)[9,:], label="Kustaanheimo-Stiefel")
-plot!(ph, sol_cart.t, h_cart, label="Cartesian")
-plot!(ph, sol_mee.t, h_mee, label="MEE")
+plot!(ph, Array(sol_khsf2)[10,:], Array(sol_khsf2)[9,:], label="traj 2")
 
 ptraj = plot(frame_style=:box, camera=(70,10), xlabel="x, DU", ylabel="y, DU", zlabel="z, DU")
 plot!(ptraj, traj_khsf2cart[1,:], traj_khsf2cart[2,:], traj_khsf2cart[3,:], label="Kustaanheimo-Stiefel")
-plot!(ptraj, traj_mee2cart[1,:], traj_mee2cart[2,:], traj_mee2cart[3,:], label="MEE")
+plot!(ptraj, traj_khsf2cart2[1,:], traj_khsf2cart2[2,:], traj_khsf2cart2[3,:], label="traj 2")
 
+cs = palette([:blue, :orange], 4)
 pkh_p = plot(frame_style=:box, xlabel="time, TU",)
 for i = 1:4
-    plot!(pkh_p, sol_khsf.t, Array(sol_khsf)[i,:], label="p_$i")
+    plot!(pkh_p, sol_khsf.t, Array(sol_khsf)[i,:], label="p_$i", c=cs[i])
+    plot!(pkh_p, sol_khsf2.t, Array(sol_khsf2)[i,:], label="p_$i", linestyle=:dash, c=cs[i])
 end
 
 pkh_pprime = plot(frame_style=:box, xlabel="time, TU",)
 for i = 1:4
-    plot!(pkh_pprime, sol_khsf.t, Array(sol_khsf)[4+i,:], label="p'_$i")
+    plot!(pkh_pprime, sol_khsf.t, Array(sol_khsf)[4+i,:], label="p'_$i", c=cs[i])
+    plot!(pkh_pprime, sol_khsf2.t, Array(sol_khsf2)[4+i,:], label="p'_$i", linestyle=:dash, c=cs[i])
 end
 
 display(plot(ptraj, ph, pkh_p, pkh_pprime; layout=(2,2), size=(800,800)))
