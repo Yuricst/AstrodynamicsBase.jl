@@ -48,10 +48,38 @@ function rotating2inertial(state_r::Vector, theta::Real, om::Real)
 end
 
 
-"""
-    inertial2rotating(state_i, theta::Real, om::Real)
 
-Conversion of state-vector from rotating to inertial frame
+"""
+    rotating2inertial(states_r::Vector, times::Union{Vector,LinRange}, theta0::Real, om::Real)
+
+Conversion of state history from rotating to inertial frame
+Ref: See Zimovan thesis 2017 pg.54
+"""
+function rotating2inertial(states_r::Vector, times::Union{Vector,LinRange}, theta0::Real, om::Real)
+    # construct transformation matrix
+    states_i = Vector[]
+    for (idx,t) in enumerate(times)
+        theta = theta0 + om*t
+        rotmat = [
+            cos(theta) -sin(theta) 0.0 0.0 0.0 0.0
+            sin(theta)  cos(theta) 0.0 0.0 0.0 0.0
+            0.0         0.0        1.0 0.0 0.0 0.0
+           -om*sin(theta) -om*cos(theta) 0.0 cos(theta) -sin(theta) 0.0
+            om*cos(theta) -om*sin(theta) 0.0 sin(theta)  cos(theta) 0.0
+            0.0            0.0           0.0 0.0         0.0        1.0
+        ]
+        # transform
+        push!(states_i, rotmat * states_r[idx])
+    end
+    return states_i
+end
+
+
+
+"""
+    inertial2rotating(state_i::Vector, theta::Real, om::Real)
+
+Conversion of state-vector from inertial to rotating frame
 Ref: See Zimovan thesis 2017 pg.54
 """
 function inertial2rotating(state_i::Vector, theta::Real, om::Real)
@@ -74,11 +102,40 @@ end
 
 
 """
+    inertial2rotating(states_i::Vector, times::Vector, theta0::Real, om::Real)
+
+Conversion of state history from inertial to rotating frame
+Ref: See Zimovan thesis 2017 pg.54
+"""
+function inertial2rotating(states_i::Vector, times::Union{Vector,LinRange}, theta0::Real, om::Real)
+    # construct transformation matrix
+    states_r = Vector[]
+    for (idx,t) in enumerate(times)
+        theta = theta0 + om*t
+        rotmat = inv(
+            [
+                cos(theta) -sin(theta) 0.0 0.0 0.0 0.0
+                sin(theta) cos(theta) 0.0 0.0 0.0 0.0
+                0.0 0.0 1.0 0.0 0.0 0.0
+                -om*sin(theta) -om*cos(theta) 0.0 cos(theta) -sin(theta) 0.0
+                om*cos(theta) -om*sin(theta) 0.0 sin(theta) cos(theta) 0.0
+                0.0 0.0 0.0 0.0 0.0 1.0
+            ],
+        )
+        # transform
+        push!(states_r, rotmat * states_i[idx])
+    end
+    return states_r
+end
+
+
+
+"""
 Convert 3-element vector from perifocal to geocentric frame
 """
-function perifocal2geocentric(vec::Vector, ω::Real, inc::Real, Ω::Real)
+function perifocal2geocentric(vec_pf::Vector, ω::Real, inc::Real, Ω::Real)
     # rotate by aop
-    v1 = _rotmat_ax3(-ω) * vec
+    v1 = _rotmat_ax3(-ω) * vec_pf
     # rotate by inclination
     v2 = _rotmat_ax1(-inc) * v1
     # rotate by raan

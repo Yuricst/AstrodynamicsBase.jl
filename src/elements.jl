@@ -415,7 +415,6 @@ function mee2cart(oe_mee::Vector, mu::Real)
 end
 
 
-
 """
 Direct conversion from Cartesian to MEE
 https://degenerateconic.com/modified-equinoctial-elements.html
