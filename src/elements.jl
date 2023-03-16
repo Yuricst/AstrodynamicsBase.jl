@@ -140,8 +140,24 @@ function get_trueanomaly(state::Array{<:Real,1}, mu::Real)
     e_vec = (1/mu) * cross(v, h_vec) - r/norm(r)
     # radial velocity
     vr = dot(v, r) / norm(r)
-	θ = atan(h * vr, h^2 / norm(r) - mu)
-    # if dot(r, ecc) / (norm(r) * norm(ecc)) <= 1.0
+
+	if norm(e_vec) > 0
+		if vr > 0   # check based on radial velocity
+			θ = acos_safe(dot(r,e_vec)/(norm(r)*norm(e_vec)))
+		else
+			θ = 2π - acos_safe(dot(r,e_vec)/(norm(r)*norm(e_vec)))
+		end
+	else
+	    ndir = cross([0, 0, 1], h_vec)
+		if r[3] > 0   # check based on rz
+			θ = acos_safe(dot(r,ndir)/(norm(r)*norm(ndir)))
+		else
+			θ = 2π - acos_safe(dot(r,ndir)/(norm(r)*norm(ndir)))
+		end
+	end
+
+	#θ = atan(h * vr, h^2 / norm(r) - mu)
+    # if dot(r, e_vec) / (norm(r) * norm(e_vec)) <= 1.0
     #     θ = atan(h * vr, h^2 / norm(r) - mu)
     # else
     #     θ = acos(1.0)
