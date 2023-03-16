@@ -3,6 +3,8 @@ Generic two body differential DifferentialEquations
 """
 
 """
+    twobody_cartesian!(du, u, p, t)
+    
 Equations of motion for two-body
 """
 function twobody_cartesian!(du, u, p, t)
@@ -22,6 +24,8 @@ end
 
 
 """
+    twobody_cartesian_j2!(du, u, p, t)
+
 Equations of motion for two-body with J2.
 Parameters are `p = [μ, J2, Re]`.
 """
@@ -43,6 +47,8 @@ end
 
 
 """
+    twobody_cartesian_planar3b!(du, u, p, t)
+
 Equations of motion for two-body with planar third body.
 Parameters are `p = [μ, mu_3b, a_3b, n_3b, λ_3b0]`.
 """
