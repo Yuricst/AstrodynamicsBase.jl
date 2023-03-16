@@ -4,7 +4,7 @@ Generic two body differential DifferentialEquations
 
 """
     twobody_cartesian!(du, u, p, t)
-    
+
 Equations of motion for two-body
 """
 function twobody_cartesian!(du, u, p, t)
