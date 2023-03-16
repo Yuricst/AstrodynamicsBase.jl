@@ -30,7 +30,7 @@ end
     rotating2inertial(state_r, theta::Real, om::Real)
 
 Conversion of state-vector from rotating to inertial frame
-Ref: See Zimovan thesis 2017 pg.54
+Ref: See Zimovan thesis 2017 pg.54 eqn. (3.72)
 """
 function rotating2inertial(state_r::Vector, theta::Real, om::Real)
     # construct transformation matrix
