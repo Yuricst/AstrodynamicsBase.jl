@@ -16,6 +16,7 @@ module AstrodynamicsBase
     include("kepler_problem.jl")
     include("eom/diffeq_twobody.jl")
     include("eom/diffeq_mee.jl")
+    include("eom/diffeq_keplerian.jl")
     include("orbit.jl")
     include("tle.jl")
     include("kustaanheimo_stiefel.jl")
