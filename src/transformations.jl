@@ -167,3 +167,55 @@ function planetmoon2sunplanet(
     # 5. shift to Sun-planet barycenter centered, Sun-planet rotating frame
     return state_4 + [1 - μ_sun, 0, 0, 0, 0, 0]
 end
+
+
+
+# """
+#     lvlh2cart(vec_lvlh::Vector, mu::Real, state0::Vector)
+
+# Convert LVLH to Cartesian frame
+# """
+# function lvlh2cart(vec_lvlh::Vector, mu::Real, state0::Vector)
+#     # conversion matrix following Markley and Crassidis 2014 pg.36
+#     r, v = state0[1:3], state0[4:6]
+#     o3I = -r / norm(r)
+#     o2I = -cross(r, v) / norm(cross(r, v))
+#     o1I = cross(o2I, o3I)
+#     A_IO = reshape(vcat(o1I, o2I, o3I), 3, 3)
+#     dv_inertial = A_IO * vec_lvlh
+#     return dv_inertial
+# end
+
+
+"""
+    eci2lvlh(x_I::Vector, y_B::Vector)
+
+Convert 3-component `y_B` vector in ECI to LVLH using current
+position and velocity vector in `x_I`
+"""
+function eci2lvlh(x_I::Vector, y_B::Vector)
+    x_hat = x_I[1:3]/norm(x_I[1:3])
+    z_hat = cross(x_I[1:3], x_I[4:6])/norm(cross(x_I[1:3], x_I[4:6]))
+    y_hat = cross(z_hat, x_hat)
+
+    R_B2I = [x_hat y_hat z_hat]
+
+    return R_B2I' * y_B
+end
+
+
+"""
+    lvlh2eci(x_I::Vector, y_B::Vector)
+    
+Convert 3-component `y_B` vector in LVLH to ECI using current
+position and velocity vector in `x_I`
+"""
+function lvlh2eci(x_I::Vector, y_B::Vector)
+    x_hat = x_I[1:3]/norm(x_I[1:3])
+    z_hat = cross(x_I[1:3], x_I[4:6])/norm(cross(x_I[1:3], x_I[4:6]))
+    y_hat = cross(z_hat, x_hat)
+
+    R_B2I = [x_hat y_hat z_hat]
+
+    return R_B2I * y_B
+end

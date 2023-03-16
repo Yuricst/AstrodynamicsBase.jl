@@ -25,7 +25,8 @@ module AstrodynamicsBase
     export _rotmat_ax1,
         _rotmat_ax2,
         _rotmat_ax3,
-        rotating2inertial, inertial2rotating, perifocal2geocentric
+        rotating2inertial, inertial2rotating, perifocal2geocentric,
+        eci2lvlh, lvlh2eci
     export get_gm,
         get_gm_de431,
         get_body_radius,
