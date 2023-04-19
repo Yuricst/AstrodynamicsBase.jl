@@ -219,3 +219,57 @@ function lvlh2eci(x_I::Vector, y_B::Vector)
 
     return R_B2I * y_B
 end
+
+
+"""
+Convert angle in arc second to radians
+"""
+function arcsec2rad(arcsec)
+    return arcsec * pi / (180 * 3600);
+end
+
+
+"""
+Convert state in ECI to ECEF
+
+# Arguments 
+    - `jd`: Julian date, e.g. 2459449.5
+    - `x_eci`: State vector in ECI coordinates, may be just position (length 3) or position & velocity (length 6)
+
+# Returns 
+    State vector in ECEF coordinates
+"""
+function eci2ecef(jd::Real, x_eci::Vector, omega_e::Real=7.29211585275553e-005)
+    # Compute the Julian centuries from J2000.0 epoch
+    T = (jd - 2451545.0) / 36525.0
+
+    # Compute the mean obliquity of the ecliptic in radians
+    eps0 = deg2rad(23.439291 - 0.0130042 * T - 1.64e-7 * T^2 + 5.04e-7 * T^3)
+
+    # Compute the nutation in obliquity in radians
+    d_eps = arcsec2rad(9.20 * sind(0.0 * T) + 0.57 * sind(2.0 * T) + 0.10 * sind(2.0 * T - 2.0 * T) - 0.09 * sind(0.0 * T)) / 3600.0
+
+    # Compute the nutation in longitude in radians
+    d_psi = arcsec2rad(0.00 * cosd(0.0 * T) + 0.16 * cosd(2.0 * T) + 0.00 * cosd(2.0 * T - 2.0 * T) + 0.00 * cosd(0.0 * T)) / 3600.0
+
+    # Compute the true obliquity of the ecliptic in radians
+    eps = eps0 + d_eps
+
+    # Compute the Greenwich Mean Sidereal Time (GMST) in radians
+    gmst_rad = deg2rad(280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T^2 - T^3 / 38710000.0 + d_psi * cos(eps))
+
+    # Define the rotation matrix from ECI to ECEF coordinates
+    R_eci_to_ecef = [cos(gmst_rad) sin(gmst_rad) 0; -sin(gmst_rad) cos(gmst_rad) 0; 0 0 1]
+
+    # Compute the position vector in ECEF coordinates
+    r_ecef = R_eci_to_ecef * x_eci[1:3]
+
+    if length(x_eci) == 3
+        return r_ecef
+    else
+        # Compute the velocity vector in ECEF coordinates
+        omega_e_vec = [0 omega_e 0]  # Earth's rotation rate vector in ECEF coordinates
+        v_ecef = R_eci_to_ecef * v_eci - cross(omega_e_vec, r_ecef)
+        return vcat(r_ecef, v_ecef)
+    end
+end
