@@ -268,7 +268,7 @@ function eci2ecef(jd::Real, x_eci::Vector, omega_e::Real=7.29211585275553e-005)
         return r_ecef
     else
         # Compute the velocity vector in ECEF coordinates
-        omega_e_vec = [0 omega_e 0]  # Earth's rotation rate vector in ECEF coordinates
+        omega_e_vec = [0 0 omega_e]  # Earth's rotation rate vector in ECEF coordinates
         v_ecef = R_eci_to_ecef * v_eci - cross(omega_e_vec, r_ecef)
         return vcat(r_ecef, v_ecef)
     end
